@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="./css/index.css">
     <!-- 引入Axios -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 引入Router -->
+    <script src="https://cdn.staticfile.org/vue-router/2.7.0/vue-router.min.js"></script>
 </head>
 
 <body>
@@ -25,21 +27,21 @@
             <el-container>
                 <!-- 侧边栏 -->
                 <el-aside width="180px">
-                    <el-menu default-active="3" class="el-menu-vertical-demo" background-color="#fff"
-                        text-color="#545c64" active-text-color="#62a5ec">
-                        <el-menu-item index="1">
+                    <el-menu default-active="/studentGrades" class="el-menu-vertical-demo" background-color="#fff"
+                        text-color="#545c64" active-text-color="#62a5ec" :router="true">
+                        <el-menu-item index="/classOverview">
                             <i class="el-icon-document"></i>
                             <span slot="title">课程概览</span>
                         </el-menu-item>
-                        <el-menu-item index="2">
+                        <el-menu-item index="/testItems">
                             <i class="el-icon-folder-checked"></i>
-                            <span slot="title">试题分类</span>
+                            <span slot="title">试题内容</span>
                         </el-menu-item>
-                        <el-menu-item index="3">
+                        <el-menu-item index="/studentGrades">
                             <i class="el-icon-user"></i>
                             <span slot="title">学生成绩</span>
                         </el-menu-item>
-                        <el-menu-item index="4">
+                        <el-menu-item index="/reportProducing">
                             <i class="el-icon-edit"></i>
                             <span slot="title">报告生成</span>
                         </el-menu-item>
@@ -48,145 +50,162 @@
                 <el-container>
                     <!-- 主窗体 -->
                     <el-main>
-                        <!-- 面包屑导航 -->
-                        <el-breadcrumb separator-class="el-icon-arrow-right">
-                            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                            <el-breadcrumb-item>学生成绩</el-breadcrumb-item>
-                        </el-breadcrumb>
-                        <!-- 表单 -->
-                        <el-form inline="ture" style='margin-top:20px'>
-                            <el-row>
-                                <el-col :span="10">
-                                    <el-form-item label="请输入查询条件">
-                                        <el-input v-model="inputStr" placeholder="输入查询条件"
-                                            style="width: 280px;"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :span="8">
-                                    <el-button-group>
-                                        <el-button type="primary" icon="el-icon-search"
-                                            @click="queryStudents">查询</el-button>
-                                        <el-button type="primary" icon="el-icon-tickets"
-                                            @click="getAllStudents">全部</el-button>
-                                        <el-button type="primary" icon="el-icon-circle-plus-outline"
-                                            @click="addStudent">添加</el-button>
-                                    </el-button-group>
-                                </el-col>
-                                <el-col :span="3">
-                                    <el-upload :show-file-list="false" :http-request="uploadExcelPost">
-                                        <el-button type="success">导入Excel</el-button>
-                                    </el-upload>
-                                </el-col>
-                                <el-col :span="2">
-                                    <el-button type="success" @click="downloadExcel">导出Excel</el-button>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-                        <!-- 表格 -->
-                        <el-table :data="pageStudents" stripe style="width: 100%" size="mini"
-                            @selection-change="handleSelectionChange">
-                            <el-table-column type="selection" align='center'>
-                            </el-table-column>
-                            <el-table-column type="index" label="序号" align='center' width="50">
-                            </el-table-column>
-                            <el-table-column prop="major" label="专业" align='center' width="120">
-                            </el-table-column>
-                            <el-table-column prop="number" label="学号" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="stuClass" label="班级" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="name" label="姓名" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="hw1" label="作业一成绩" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="hw2" label="作业二成绩" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="exp1" label="实验一成绩" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="exp2" label="实验二成绩" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column prop="exp3" label="实验三成绩" align='center' width="100">
-                            </el-table-column>
-                            <el-table-column label="操作">
-                                <template slot-scope="scope">
-                                    <el-button type="primary" icon="el-icon-edit" size='mini' circle
-                                        @click="editStudent(scope.row)"></el-button>
-                                    <el-button type="danger" icon="el-icon-delete" size='mini' circle
-                                        @click="deleteStudent(scope.row)"></el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <!-- 分页 -->
-                        <el-row style="margin-top:20px">
-                            <el-col :span="8" style="text-align:left">
-                                <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteStudents">批量删除</el-button>
-                            </el-col>
-                            <el-col :span="16" style="text-align:right">
-                                <el-pagination @current-change="handleCurrentChange" :current-page="currentpage"
-                                    :page-size="pagesize" layout="total, prev, pager, next, jumper" :total="total">
-                                </el-pagination>
-                            </el-col>
-                        </el-row>
-                        <!-- 弹出框的学生信息表单 -->
-                        <el-dialog :title="formTitle" :visible.sync="dialogVisible" width="50%"
-                            :close-on-click-modal="false" @close="closeDialogForm('studentForm')">
-                            <el-form :model="studentForm" ref='studentForm' :rules="rules" inline="ture"
-                                label-width="110px" label-position="right" size="mini">
-                                <el-form-item label="专业" prop="major">
-                                    <el-input v-model="studentForm.major" :disabled="isEdit" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="班级" prop="stuClass">
-                                    <el-input v-model="studentForm.stuClass" :disabled="isEdit"
-                                        suffix-icon="el-icon-edit" style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="学号" prop="number">
-                                    <el-input v-model="studentForm.number" :disabled="isEdit" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="姓名" prop="name">
-                                    <el-input v-model="studentForm.name" :disabled="isEdit" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="作业一成绩">
-                                    <el-input v-model="studentForm.hw1" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="作业二成绩">
-                                    <el-input v-model="studentForm.hw2" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="实验一成绩">
-                                    <el-input v-model="studentForm.exp1" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="实验二成绩">
-                                    <el-input v-model="studentForm.exp2" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                                <el-form-item label="实验三成绩">
-                                    <el-input v-model="studentForm.exp3" suffix-icon="el-icon-edit"
-                                        style="width: 93%"></el-input>
-                                </el-form-item>
-                            </el-form>
-                            <span slot="footer" class="dialog-footer">
-                                <el-button size="mini" type="info" @click="closeDialogForm('studentForm')">取
-                                    消</el-button>
-                                <el-button size="mini" type="primary" @click="submitStudentForm('studentForm')">保
-                                    存</el-button>
-                            </span>
-                        </el-dialog>
+                        <router-view>
+
+                        </router-view>
                     </el-main>
                     <el-footer height="30px">联系人:xlx | 邮箱:751333411@qq.com | 修订时间:2024-2-15</el-footer>
                 </el-container>
             </el-container>
         </el-container>
     </div>
-
-
-
-
 </body>
+
+
+<template id="classOverview">
+    <div>
+        <span>课程概览</span>
+    </div>
+</template>
+
+
+<template id="testItems">
+    <div>
+        <span>试题内容</span>
+    </div>
+</template>
+
+
+<template id="studentGrades">
+    <div>
+        <!-- 面包屑导航
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>学生成绩</el-breadcrumb-item>
+        </el-breadcrumb> -->
+        <!-- 表单 -->
+        <el-form inline="ture" style='margin-top:20px'>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="请输入查询条件">
+                        <el-input v-model="inputStr" placeholder="输入查询条件" style="width: 280px;"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-button-group>
+                        <el-button type="primary" icon="el-icon-search" @click="queryStudents">查询</el-button>
+                        <el-button type="primary" icon="el-icon-tickets" @click="getAllStudents">全部</el-button>
+                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="addStudent">添加</el-button>
+                    </el-button-group>
+                </el-col>
+                <el-col :span="3">
+                    <el-upload :show-file-list="false" :http-request="uploadExcelPost">
+                        <el-button type="success">导入Excel</el-button>
+                    </el-upload>
+                </el-col>
+                <el-col :span="2">
+                    <el-button type="success" @click="downloadExcel">导出Excel</el-button>
+                </el-col>
+            </el-row>
+        </el-form>
+        <!-- 表格 -->
+        <el-table :data="pageStudents" stripe style="width: 100%" size="mini" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" align='center'>
+            </el-table-column>
+            <el-table-column type="index" label="序号" align='center' width="50">
+            </el-table-column>
+            <el-table-column prop="major" label="专业" align='center' width="120">
+            </el-table-column>
+            <el-table-column prop="number" label="学号" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="stuClass" label="班级" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="name" label="姓名" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="hw1" label="作业一成绩" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="hw2" label="作业二成绩" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="exp1" label="实验一成绩" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="exp2" label="实验二成绩" align='center' width="100">
+            </el-table-column>
+            <el-table-column prop="exp3" label="实验三成绩" align='center' width="100">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button type="primary" icon="el-icon-edit" size='mini' circle
+                        @click="editStudent(scope.row)"></el-button>
+                    <el-button type="danger" icon="el-icon-delete" size='mini' circle
+                        @click="deleteStudent(scope.row)"></el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 分页 -->
+        <el-row style="margin-top:20px">
+            <el-col :span="8" style="text-align:left">
+                <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteStudents">批量删除</el-button>
+            </el-col>
+            <el-col :span="16" style="text-align:right">
+                <el-pagination @current-change="handleCurrentChange" :current-page="currentpage" :page-size="pagesize"
+                    layout="total, prev, pager, next, jumper" :total="total">
+                </el-pagination>
+            </el-col>
+        </el-row>
+        <!-- 弹出框的学生信息表单 -->
+        <el-dialog :title="formTitle" :visible.sync="dialogVisible" width="50%" :close-on-click-modal="false"
+            @close="closeDialogForm('studentForm')">
+            <el-form :model="studentForm" ref='studentForm' :rules="rules" inline="ture" label-width="110px"
+                label-position="right" size="mini">
+                <el-form-item label="专业" prop="major">
+                    <el-input v-model="studentForm.major" :disabled="isEdit" suffix-icon="el-icon-edit"
+                        style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="班级" prop="stuClass">
+                    <el-input v-model="studentForm.stuClass" :disabled="isEdit" suffix-icon="el-icon-edit"
+                        style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="学号" prop="number">
+                    <el-input v-model="studentForm.number" :disabled="isEdit" suffix-icon="el-icon-edit"
+                        style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" prop="name">
+                    <el-input v-model="studentForm.name" :disabled="isEdit" suffix-icon="el-icon-edit"
+                        style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="作业一成绩">
+                    <el-input v-model="studentForm.hw1" suffix-icon="el-icon-edit" style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="作业二成绩">
+                    <el-input v-model="studentForm.hw2" suffix-icon="el-icon-edit" style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="实验一成绩">
+                    <el-input v-model="studentForm.exp1" suffix-icon="el-icon-edit" style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="实验二成绩">
+                    <el-input v-model="studentForm.exp2" suffix-icon="el-icon-edit" style="width: 93%"></el-input>
+                </el-form-item>
+                <el-form-item label="实验三成绩">
+                    <el-input v-model="studentForm.exp3" suffix-icon="el-icon-edit" style="width: 93%"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button size="mini" type="info" @click="closeDialogForm('studentForm')">取
+                    消</el-button>
+                <el-button size="mini" type="primary" @click="submitStudentForm('studentForm')">保
+                    存</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</template>
+
+
+<template id="reportProducing">
+    <div>
+        <span>报告生成</span>
+    </div>
+</template>
+
 
 </html>
 <script src="./js/index.js"></script>
