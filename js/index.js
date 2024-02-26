@@ -1,5 +1,46 @@
-const app = new Vue({
-    el: '#app',
+const ClassOverview = {
+    props: ['todo'],
+    template: '#classOverview',
+    data() {
+        return {
+            token: ''
+
+        }
+    },
+    methods: {
+
+    },
+    mounted() {
+        console.log('组件ClassOverview被挂载了');
+    },
+    created() {
+
+    }
+};
+
+const TestItems = {
+    props: ['todo'],
+    template: '#testItems',
+    data() {
+        return {
+            token: ''
+
+        }
+    },
+    methods: {
+
+    },
+    mounted() {
+        console.log('组件TestItems被挂载了');
+    },
+    created() {
+
+    }
+};
+
+const StudentGrades = {
+    props: ['todo'],
+    template: '#studentGrades',
     data() {
         //检验学号是否存在
         const rulesnumber = (rule, value, callback) => {
@@ -29,7 +70,7 @@ const app = new Vue({
         }
 
         return {
-            baseURL: 'http://192.168.1.28:8000/',
+            baseURL: 'http://172.20.10.2:8000/',
             students: [], //所有学生信息
             pageStudents: [], //当前页的学生信息
             total: 0, //数据总行数
@@ -78,7 +119,7 @@ const app = new Vue({
     },
     methods: {
         //获取所有学生信息
-        getStudents: function () {
+        getStudents() {
             //记录this的指针
             let that = this;
             //使用Axios实现Ajax请求
@@ -109,7 +150,6 @@ const app = new Vue({
                     console.log(err)
                 });
         },
-
         //获取当前页的学生信息
         getPageStudents() {
             this.pageStudents = [];
@@ -180,7 +220,6 @@ const app = new Vue({
             this.currentpage = pageNumber;
             this.getPageStudents();
         },
-
         //学生信息的查询
         queryStudents() {
             let that = this;
@@ -219,7 +258,6 @@ const app = new Vue({
                     })
             }
         },
-
         //获取全部学生信息
         getAllStudents() {
             //清空查询条件
@@ -227,14 +265,12 @@ const app = new Vue({
             //获取所有学生信息
             this.getStudents();
         },
-
         //添加按键事件
         addStudent() {
             this.dialogVisible = true;
             this.formTitle = "添加学生明细";
 
         },
-
         //编辑学生信息按键事件
         editStudent(row) {
             //打开对话框
@@ -433,5 +469,60 @@ const app = new Vue({
             this.selectStudents = data;
         },
     },
+    created() {
+
+    }
+};
+
+const ReportProducing = {
+    props: ['todo'],
+    template: '#reportProducing',
+    data() {
+        return {
+            token: ''
+
+        }
+    },
+    methods: {
+
+    },
+    mounted() {
+        console.log('组件ReportProducing被挂载了');
+    },
+    created() {
+
+    }
+};
+
+const router = new VueRouter({
+    routes: [
+        {
+            path: '/classOverview',
+            component: ClassOverview,
+        },
+        {
+            path: '/testItems',
+            component:TestItems,
+        },
+        {
+            path: '/studentGrades',
+            component: StudentGrades,
+        },
+        {
+            path: '/reportProducing',
+            component: ReportProducing,
+        },
+    ]
+});
+
+const app = new Vue({
+    router,
+    el: '#app',
+        data: {
+
+        },
+        methods: {
+
+        }
 
 })
