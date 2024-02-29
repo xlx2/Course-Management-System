@@ -3,6 +3,11 @@ html,body,#app,.el-container{
     padding: 0px;
     height: 100%;
 }
+
+.el-descriptions-item {
+    background-color: #ecf5ff;
+}
+
 .el-header {
     background-color: #c6e2ff;
     color: #545c64;
