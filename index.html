@@ -29,7 +29,7 @@
                 <el-aside width="180px">
                     <el-menu default-active="/studentGrades" class="el-menu-vertical-demo" background-color="#fff"
                         text-color="#545c64" active-text-color="#62a5ec" :router="true">
-                        <el-menu-item index="/classOverview">
+                        <el-menu-item index="/courseOverview">
                             <i class="el-icon-document"></i>
                             <span slot="title">课程概览</span>
                         </el-menu-item>
@@ -62,9 +62,78 @@
 </body>
 
 
-<template id="classOverview">
+<template id="courseOverview">
     <div>
-        <span>课程概览</span>
+        <el-tabs>
+            <!-- 课程基本情况标签页 -->
+            <el-tab-pane label="课程基本情况">
+                <!-- 描述框 -->
+                <el-descriptions class="margin-top" :column="2">
+                    <el-descriptions-item label="课程名称(中文)">
+                        {{courseForm.courseNameCN}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程名称(英文)">
+                        {{courseForm.courseNameEN}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程编号">
+                        {{courseForm.courseNumber}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="学分/学时">
+                        {{courseForm.courseCredit}}/{{courseForm.coursePeriod}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="任课教师">
+                        {{courseForm.courseTeacher}}
+                    </el-descriptions-item>
+                </el-descriptions>
+                <!-- 编辑按钮 -->
+                <el-button type="primary" @click="editCourseButton">编辑</el-button>
+                <!-- 弹出框的课程信息表单 -->
+                <el-dialog title="编辑课程信息" :visible.sync="dialogVisible" width="50%" :close-on-click-modal="false">
+                    <el-form :model="courseForm" ref='courseForm' inline="ture" label-width="110px"
+                        label-position="right" size="mini">
+                        <el-form-item label="课程名称(中文)" prop="courseName_cn">
+                            <el-input v-model="courseForm.courseName_cn" suffix-icon="el-icon-edit"
+                                style="width: 93%"></el-input>
+                        </el-form-item>
+                        <el-form-item label="课程名称(英文)" prop="courseName_en">
+                            <el-input v-model="courseForm.courseName_en" suffix-icon="el-icon-edit"
+                                style="width: 93%"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button size="mini" type="info">
+                            取消
+                        </el-button>
+                        <el-button size="mini" type="primary">
+                            保存
+                        </el-button>
+                    </span>
+                </el-dialog>
+            </el-tab-pane>
+            <!-- 课程目标标签页 -->
+            <el-tab-pane label="课程目标">
+                <el-descriptions class="margin-top" :column="1">
+                    <el-descriptions-item label="课程目标1">
+                        {{courseForm.courseObject1}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程目标2">
+                        {{courseForm.courseObject2}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程目标3">
+                        {{courseForm.courseObject3}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程目标4">
+                        {{courseForm.courseObject4}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程目标5">
+                        {{courseForm.courseObject5}}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="课程目标6">
+                        {{courseForm.courseObject6}}
+                    </el-descriptions-item>
+                </el-descriptions>
+            </el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 
@@ -202,7 +271,7 @@
 
 <template id="reportProducing">
     <div>
-        <span>报告生成</span>
+        <el-button type="success" @click="downloadReport">导出报告</el-button>
     </div>
 </template>
 
