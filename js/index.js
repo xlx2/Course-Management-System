@@ -1,17 +1,94 @@
-const ClassOverview = {
+const CourseOverview = {
     props: ['todo'],
-    template: '#classOverview',
+    template: '#courseOverview',
     data() {
         return {
-            token: ''
-
+            baseURL: 'http://172.20.10.2:8000/',
+            dialogVisible: false, //表单是否显示
+            courseForm: {
+                courseNumber: '',
+                courseNameCN: '',
+                courseNameEN: '',
+                courseCredit: '',
+                coursePeriod: '',
+                courseTeacher: '',
+                courseObject1: '',
+                courseObject2: '',
+                courseObject3: '',
+                courseObject4: '',
+                courseObject5: '',
+                courseObject6: '',
+            },
         }
     },
     methods: {
+        //获取课程信息
+        getCourse() {
+            //记录this的指针
+            let that = this;
+            //使用Axios实现Ajax请求
+            axios
+                .get(that.baseURL + 'course/')
+                .then(function (res) {
+                    //请求成功后执行的函数
+                    if (res.data.code === 1) {
+                        //把数据传给course
+                        that.courseForm = res.data.data[0];
+                        //成功提示
+                        that.$message({
+                            message: '课程数据加载成功',
+                            type: 'success'
+                        });
+                    }
+                    else {
+                        //失败提示
+                        that.$message.error(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    //请求失败后执行的函数
+                    console.log(err)
+                });
+        },
+        //编辑课程信息
+        editCourse(){
+            //记录this的指针
+            let that = this;
+            //使用Axios实现Ajax请求
+            axios
+                .post(that.baseURL + 'editCourse/',
+                {
 
+                })
+                .then(function (res) {
+                    //请求成功后执行的函数
+                    if (res.data.code === 1) {
+                        //把数据传给course
+                        that.courseForm = res.data.data[0];
+                        //成功提示
+                        that.$message({
+                            message: '课程数据修改成功',
+                            type: 'success'
+                        });
+                    }
+                    else {
+                        //失败提示
+                        that.$message.error(res.data.msg);
+                    }
+                })
+                .catch(function (err) {
+                    //请求失败后执行的函数
+                    console.log(err)
+                });
+        },
+        //添加按键事件
+        editCourseButton() {
+            this.dialogVisible = true;
+
+        },
     },
     mounted() {
-        console.log('组件ClassOverview被挂载了');
+        this.getCourse();
     },
     created() {
 
@@ -23,7 +100,6 @@ const TestItems = {
     template: '#testItems',
     data() {
         return {
-            token: ''
 
         }
     },
@@ -215,7 +291,7 @@ const StudentGrades = {
                     that.$message.error("Excel导出学生信息时获取后端学生信息失败!")
                 })
         },
-        // 调整当前页码
+        //调整当前页码
         handleCurrentChange(pageNumber) {
             this.currentpage = pageNumber;
             this.getPageStudents();
@@ -463,7 +539,6 @@ const StudentGrades = {
             //初始化编辑状态
             this.isEdit = false;
         },
-
         //选择复选框时触发的操作
         handleSelectionChange(data) {
             this.selectStudents = data;
@@ -479,12 +554,28 @@ const ReportProducing = {
     template: '#reportProducing',
     data() {
         return {
-            token: ''
+            baseURL: 'http://172.20.10.2:8000/',
 
         }
     },
     methods: {
-
+        downloadReport(file) {
+            let that = this;
+            axios
+                .get(that.baseURL + 'course/report/',)
+                .then((res) => {
+                    if (res.data.code === 1) {
+                        let url = that.baseURL + 'media/' + res.data.name;
+                        window.open(url);
+                    } else {
+                        that.$message.error('导出Word出现异常!')
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    that.$message.error("导出报告时获取后端学生信息失败!")
+                })
+        },
     },
     mounted() {
         console.log('组件ReportProducing被挂载了');
@@ -497,8 +588,8 @@ const ReportProducing = {
 const router = new VueRouter({
     routes: [
         {
-            path: '/classOverview',
-            component: ClassOverview,
+            path: '/courseOverview',
+            component: CourseOverview,
         },
         {
             path: '/testItems',
